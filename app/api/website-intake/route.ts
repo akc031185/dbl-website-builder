@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
+import connectToDatabase from '@/lib/db'
+import WebsiteRequest from '@/models/WebsiteRequest'
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,6 +16,30 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         )
       }
+    }
+
+    // Connect to database and save request
+    let savedRequest;
+    try {
+      await connectToDatabase();
+
+      // Create new website request
+      const websiteRequest = new WebsiteRequest({
+        contactName: data.contactName,
+        contactEmail: data.contactEmail,
+        phone: data.phone,
+        domainName: data.domainName,
+        businessType: data.businessType,
+        siteDescription: data.siteDescription,
+        targetAudience: data.targetAudience,
+        logoOption: data.logoOption,
+        additionalNotes: data.additionalNotes
+      });
+
+      savedRequest = await websiteRequest.save();
+    } catch (dbError) {
+      console.error('Database error:', dbError);
+      // Continue with email only if database fails
     }
 
     // Create email transporter
@@ -124,6 +150,12 @@ export async function POST(request: NextRequest) {
                     <div class="field-label">Submitted:</div>
                     <div class="field-value">${new Date().toLocaleString()}</div>
                 </div>
+                ${savedRequest ? `
+                <div class="field">
+                    <div class="field-label">Request ID:</div>
+                    <div class="field-value">${savedRequest._id}</div>
+                </div>
+                ` : ''}
             </div>
         </div>
     </div>
@@ -142,7 +174,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Website request submitted successfully'
+      message: 'Website request submitted successfully',
+      requestId: savedRequest?._id
     })
 
   } catch (error) {
