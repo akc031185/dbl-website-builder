@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import connectToDatabase from '@/lib/db';
 import Post from '@/models/Post';
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://dadbuildinglegacy.com';
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://dbl-website-builder.vercel.app';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Static pages
@@ -27,6 +27,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     {
       url: `${baseUrl}/journal?tag=health`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/website-request`,
       lastModified: new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.8,
