@@ -28,11 +28,12 @@ export async function POST(request: NextRequest) {
     })
 
     // Format the logo option for email
-    const logoOptionText = {
+    const logoOptions: Record<string, string> = {
       'existing': 'I have an existing logo',
       'create-new': 'Create a new logo for me',
       'text-only': 'Use text-only logo'
-    }[data.logoOption] || data.logoOption
+    }
+    const logoOptionText = logoOptions[data.logoOption] || data.logoOption
 
     // Email content
     const emailContent = `
