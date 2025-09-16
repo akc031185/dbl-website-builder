@@ -1,0 +1,14 @@
+# *
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_next/
+Disallow: /*.json$
+Disallow: /test-email
+
+# Host
+Host: https://dadbuildinglegacy.com
+
+# Sitemaps
+Sitemap: https://dadbuildinglegacy.com/sitemap.xml
