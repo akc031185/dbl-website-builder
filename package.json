@@ -5,6 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:subdirectory": "NEXT_PUBLIC_BASE_PATH=/website-builder next build",
+    "export": "next build && next export",
+    "export:subdirectory": "NEXT_PUBLIC_BASE_PATH=/website-builder next build && next export",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",

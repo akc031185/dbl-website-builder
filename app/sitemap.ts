@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import connectToDatabase from '@/lib/db';
 import Post from '@/models/Post';
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://dbl-website-builder.vercel.app';
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://dadbuildinglegacy.com/website-builder';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Static pages
