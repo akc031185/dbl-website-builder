@@ -1,12 +1,10 @@
 import mongoose from "mongoose";
 import { MongoClient, Db } from 'mongodb';
 
-const MONGODB_URI = process.env.MONGODB_URI!;
+const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
-  throw new Error(
-    "Please define the MONGODB_URI environment variable inside .env.local"
-  );
+  console.warn("MONGODB_URI not defined - database features will be disabled");
 }
 
 /**
@@ -21,6 +19,10 @@ if (!cached) {
 }
 
 async function connectToDatabase() {
+  if (!MONGODB_URI) {
+    throw new Error("MONGODB_URI not defined - cannot connect to database");
+  }
+
   if (cached.conn) {
     return cached.conn;
   }
@@ -56,27 +58,36 @@ export default connectToDatabase;
 let client: MongoClient;
 let clientPromise: Promise<MongoClient>;
 
-if (process.env.NODE_ENV === 'development') {
-  // In development mode, use a global variable so that the value
-  // is preserved across module reloads caused by HMR (Hot Module Replacement).
-  let globalWithMongo = global as typeof globalThis & {
-    _mongoClientPromise?: Promise<MongoClient>
-  }
+if (MONGODB_URI) {
+  if (process.env.NODE_ENV === 'development') {
+    // In development mode, use a global variable so that the value
+    // is preserved across module reloads caused by HMR (Hot Module Replacement).
+    let globalWithMongo = global as typeof globalThis & {
+      _mongoClientPromise?: Promise<MongoClient>
+    }
 
-  if (!globalWithMongo._mongoClientPromise) {
+    if (!globalWithMongo._mongoClientPromise) {
+      client = new MongoClient(MONGODB_URI)
+      globalWithMongo._mongoClientPromise = client.connect()
+    }
+    clientPromise = globalWithMongo._mongoClientPromise
+  } else {
+    // In production mode, it's best to not use a global variable.
     client = new MongoClient(MONGODB_URI)
-    globalWithMongo._mongoClientPromise = client.connect()
+    clientPromise = client.connect()
   }
-  clientPromise = globalWithMongo._mongoClientPromise
 } else {
-  // In production mode, it's best to not use a global variable.
-  client = new MongoClient(MONGODB_URI)
-  clientPromise = client.connect()
+  // Create a dummy promise that will always reject
+  clientPromise = Promise.reject(new Error("MONGODB_URI not defined"))
 }
 
 let cachedDb: Db | null = null
 
 export async function getDb(): Promise<Db> {
+  if (!MONGODB_URI) {
+    throw new Error("MONGODB_URI not defined - cannot connect to database");
+  }
+
   if (cachedDb) {
     return cachedDb
   }
@@ -84,7 +95,7 @@ export async function getDb(): Promise<Db> {
   const client = await clientPromise
   const dbName = new URL(MONGODB_URI).pathname.slice(1) || 'dadbuildinglegacy'
   cachedDb = client.db(dbName)
-  
+
   return cachedDb
 }
 

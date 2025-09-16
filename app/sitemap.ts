@@ -41,22 +41,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Dynamic journal posts
   let dynamicPages: MetadataRoute.Sitemap = [];
-  
-  try {
-    await connectToDatabase();
-    
-    const posts = await Post.find({ published: true })
-      .sort({ createdAt: -1 })
-      .select('slug updatedAt')
-      .lean()
-      .exec();
 
-    dynamicPages = posts.map((post) => ({
-      url: `${baseUrl}/journal/${post.slug}`,
-      lastModified: new Date(post.updatedAt),
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
-    }));
+  try {
+    // Only try to connect if MONGODB_URI is available
+    if (process.env.MONGODB_URI) {
+      await connectToDatabase();
+
+      const posts = await Post.find({ published: true })
+        .sort({ createdAt: -1 })
+        .select('slug updatedAt')
+        .lean()
+        .exec();
+
+      dynamicPages = posts.map((post) => ({
+        url: `${baseUrl}/journal/${post.slug}`,
+        lastModified: new Date(post.updatedAt),
+        changeFrequency: 'monthly' as const,
+        priority: 0.7,
+      }));
+    } else {
+      console.log('MONGODB_URI not available - skipping dynamic journal posts in sitemap');
+    }
   } catch (error) {
     console.error('Error generating sitemap for posts:', error);
   }
