@@ -196,8 +196,8 @@ export default function WebsiteRequestPage() {
                 cursor: 'pointer',
                 transition: 'background-color 0.2s'
               }}
-              onMouseOver={(e) => e.target.style.background = '#1e40af'}
-              onMouseOut={(e) => e.target.style.background = '#1e3a8a'}
+              onMouseOver={(e) => (e.target as HTMLButtonElement).style.background = '#1e40af'}
+              onMouseOut={(e) => (e.target as HTMLButtonElement).style.background = '#1e3a8a'}
             >
               Submit Website Request
             </button>
