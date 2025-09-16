@@ -23,13 +23,13 @@ export default function BuildMySitePage() {
     { ext: '.biz', price: '$16.99', popular: false, description: 'Business focused' }
   ]
 
-  const handleDomainInputChange = (e) => {
+  const handleDomainInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/\.[a-z]+$/i, '') // Remove any extension they type
     setDomainInput(value)
     setShowDomainOptions(value.length >= 5) // Show options after typing at least 5 characters
   }
 
-  const selectDomain = (ext) => {
+  const selectDomain = (ext: string) => {
     setSelectedExtension(ext)
   }
 
